@@ -1,0 +1,33 @@
+version: '3'
+services:
+    mysql-5.7:
+        container_name: mysql-5.7
+        image: library/mysql:5.7
+        ports:
+            - 3357:3357
+        environment:
+            MYSQL_ROOT_PASSWORD: 12345
+            TZ: Europe/Moscow
+            MYSQL_TCP_PORT: 3357
+        volumes:
+            - "mysql_dump:/docker-entrypoint-initdb.d"
+            - "./mysqld.cnf:/etc/mysql/conf.d/custom-mysqld.cnf:cached"
+    mysql-8:
+        container_name: mysql-8
+        image: library/mysql:8
+        ports:
+            - 3380:3380
+        environment:
+            MYSQL_ROOT_PASSWORD: 12345
+            TZ: Europe/Moscow
+            MYSQL_TCP_PORT: 3380
+        volumes:
+            - "mysql_dump:/docker-entrypoint-initdb.d"
+            - "./mysqld.cnf:/etc/mysql/conf.d/custom-mysqld.cnf:cached"
+volumes:
+    mysql_dump:
+        driver: local
+        driver_opts:
+            type: none
+            device: "${PWD}/mysql/mysql_dump/"
+            o: bind
