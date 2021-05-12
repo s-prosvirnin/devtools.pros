@@ -1,0 +1,21 @@
+version: '3'
+services:
+    postgres-10:
+        container_name: postgres-10
+        image: library/postgres:10
+        ports:
+            - 5439:5432
+        environment:
+            POSTGRES_PASSWORD: 12345
+            POSTGRES_USER: postgres
+        volumes:
+            - "dump:/docker-entrypoint-initdb.d"
+            #- "mount:/var/lib/postgresql/data"
+            - "./postgres10.conf:/etc/postgresql/postgresql.conf"
+volumes:
+    dump:
+        driver: local
+        driver_opts:
+            type: none
+            device: "${PWD}/Docker/postgres/dump"
+            o: bind
