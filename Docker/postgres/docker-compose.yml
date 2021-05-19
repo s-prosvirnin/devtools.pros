@@ -4,14 +4,54 @@ services:
         container_name: postgres-10
         image: library/postgres:10
         ports:
-            - 5439:5432
+            - 54320:5432
         environment:
             POSTGRES_PASSWORD: 12345
             POSTGRES_USER: postgres
+            POSTGRES_DB: postgres
         volumes:
             - "dump:/docker-entrypoint-initdb.d"
             #- "mount:/var/lib/postgresql/data"
             - "./postgres10.conf:/etc/postgresql/postgresql.conf"
+    postgres-11:
+        container_name: postgres-11
+        image: library/postgres:11
+        ports:
+            - 54321:5432
+        environment:
+            POSTGRES_PASSWORD: 12345
+            POSTGRES_USER: postgres
+            POSTGRES_DB: test
+        volumes:
+            - "dump:/docker-entrypoint-initdb.d"
+            #- "mount:/var/lib/postgresql/data"
+            - "./postgres11.conf:/etc/postgresql/postgresql.conf"
+    postgres-12:
+        container_name: postgres-12
+        image: library/postgres:12
+        ports:
+            - 54322:5432
+        environment:
+            POSTGRES_PASSWORD: 12345
+            POSTGRES_USER: postgres
+            POSTGRES_DB: test
+        volumes:
+            - "dump:/docker-entrypoint-initdb.d"
+            #- "mount:/var/lib/postgresql/data"
+            - "./postgres12.conf:/etc/postgresql/postgresql.conf"
+    postgres-13:
+        container_name: postgres-13
+        image: library/postgres:13
+        ports:
+            - 54323:5432
+        environment:
+            POSTGRES_PASSWORD: 12345
+            POSTGRES_USER: postgres
+            POSTGRES_DB: test
+        volumes:
+            - "dump:/docker-entrypoint-initdb.d"
+            #- "mount:/var/lib/postgresql/data"
+            - "./postgres13.conf:/etc/postgresql/postgresql.conf"
 volumes:
     dump:
         driver: local
