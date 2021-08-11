@@ -6,3 +6,8 @@ services:
         build: .
         ports:
             - "3000:3000"
+        environment:
+            user: $user
+            group: $group
+        volumes:
+            - "${PWD}/src:/app"
