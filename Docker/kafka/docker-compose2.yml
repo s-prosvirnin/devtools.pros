@@ -1,0 +1,60 @@
+version: '3.4'
+
+services:
+    zookeeper:
+        container_name: zookeeper_dev
+        image: wurstmeister/zookeeper
+        ports:
+            - "2181:2181"
+
+    kafka:
+        container_name: kafka_dev
+        hostname: kafka.dev
+        image: wurstmeister/kafka
+        depends_on:
+            - zookeeper
+        ports:
+            - "9092:9092"
+        expose:
+            - "9093"
+        environment:
+            KAFKA_ADVERTISED_LISTENERS: INSIDE://:9093,OUTSIDE://:9092
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+            KAFKA_LISTENERS: INSIDE://:9093,OUTSIDE://:9092
+            KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+            KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+            KAFKA_CREATE_TOPICS: "test:1:1"
+    kafka-rest:
+        container_name: kafka-rest
+        image: 'confluentinc/cp-kafka-rest:latest'
+        ports:
+            - '8082:8082'
+        environment:
+            - TZ=Europe/Moscow
+            - KAFKA_REST_ZOOKEEPER_CONNECT=zookeeper:2181
+            - KAFKA_REST_HOST_NAME=host.docker.internal:8082
+        depends_on:
+            - kafka
+    kafka-topics-ui:
+        container_name: kafka-topics-ui
+        image: 'landoop/kafka-topics-ui:latest'
+        ports:
+            - '8000:8000'
+        environment:
+            - TZ=Europe/Moscow
+            - PROXY=true
+            - KAFKA_REST_PROXY_URL=host.docker.internal:8082
+        depends_on:
+            - kafka-rest
+    kafka-connect-ui:
+        container_name: kafka-connect-ui
+        image: 'landoop/kafka-connect-ui:latest'
+        ports:
+            - '8001:8001'
+        environment:
+            - TZ=Europe/Moscow
+            - PROXY=true
+            - PORT=8001
+            - CONNECT_URL=host.docker.internal:8082
+        depends_on:
+            - kafka-rest

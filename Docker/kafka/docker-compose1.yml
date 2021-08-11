@@ -1,0 +1,32 @@
+version: '3.4'
+
+services:
+    # Локальная kafka
+    zookeeper:
+        container_name: zookeeper.ddk
+        image: wurstmeister/zookeeper
+        networks:
+            - ddknet
+        ports:
+            - 127.0.0.1:2181:2181
+
+    kafka:
+        container_name: kafka.ddk
+        hostname: kafka.ddk
+        image: wurstmeister/kafka
+        depends_on:
+            - zookeeper
+        environment:
+            KAFKA_ZOOKEEPER_CONNECT: zookeeper.ddk:2181
+            KAFKA_ADVERTISED_LISTENERS: "INSIDE://:11192,OUTSIDE://:${DOCKER_KAFKA_PORT:-9092}"
+            KAFKA_LISTENERS: "INSIDE://:11192,OUTSIDE://:${DOCKER_KAFKA_PORT:-9092}"
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT"
+            KAFKA_INTER_BROKER_LISTENER_NAME: "INSIDE"
+        networks:
+            - ddknet
+        ports:
+            - 127.0.0.1:${DOCKER_KAFKA_PORT:-9092}:${DOCKER_KAFKA_PORT:-9092}
+
+networks:
+    ddknet:
+        driver: bridge

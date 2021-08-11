@@ -1,0 +1,41 @@
+version: '3.4'
+
+services:
+    zookeeper.dev:
+        container_name: zookeeper.dev
+        image: wurstmeister/zookeeper
+        ports:
+            - "2181:2181"
+
+    kafka.dev:
+        container_name: kafka.dev
+        hostname: kafka.dev
+        image: wurstmeister/kafka
+        depends_on:
+            - zookeeper.dev
+        ports:
+            - 127.0.0.1:${DOCKER_KAFKA_PORT:-9092}:${DOCKER_KAFKA_PORT:-9092}
+        environment:
+            KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+            KAFKA_ADVERTISED_LISTENERS: "INSIDE://:11192,OUTSIDE://:${DOCKER_KAFKA_PORT:-9092}"
+            KAFKA_LISTENERS: "INSIDE://:11192,OUTSIDE://:${DOCKER_KAFKA_PORT:-9092}"
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT"
+            KAFKA_INTER_BROKER_LISTENER_NAME: "INSIDE"
+
+            #KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+            #KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+            #KAFKA_LISTENERS: INSIDE://:9092,OUTSIDE://127.0.0.1:9092
+            #KAFKA_ADVERTISED_LISTENERS: INSIDE://:9092,OUTSIDE://127.0.0.1:9092
+            #KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+
+            KAFKA_CREATE_TOPICS: "test:1:1"
+
+    kafka-ui.dev:
+        container_name: kafka-ui.dev
+        image: quay.io/cloudhut/kowl:master
+        ports:
+            - "8080:8080"
+        depends_on:
+            - kafka.dev
+        environment:
+            KAFKA_BROKERS=host.docker.internal:9092:

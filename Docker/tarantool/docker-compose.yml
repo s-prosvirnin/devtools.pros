@@ -1,0 +1,13 @@
+version: '3.4'
+
+services:
+    tarantool.dev:
+        container_name: tarantool.dev
+        image: tarantool/tarantool:2.7
+        ports:
+            - "3301:3301"
+        #volumes:
+            #- "./data:/var/lib/tarantool"
+        #environment:
+            #TARANTOOL_USER_NAME:123
+            #TARANTOOL_USER_PASSWORD:123
