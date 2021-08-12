@@ -1,32 +1,20 @@
-FROM golang:latest
+FROM golang:latest as golang_dev
 
-WORKDIR /app
+# переход к папке в контейнере
+WORKDIR /app/src
 
+# копируем необходимые для Dockerfile файлы
+COPY ./src/go.mod ./
+COPY ./src/go.sum ./
+COPY ./src/cmd/main.go ./cmd/
 
-#RUN apt-get update && apt-get install -y
-
-COPY ./src .
-
-#COPY ./go.mod .
-
-#RUN go mod init example
-#RUN go mod download
+# скачиваем нужные зависимости для go
 RUN go mod tidy
-#RUN go get github.com/gin-gonic/gin
-#RUN  go get github.com/gin-gonic/gin  github.com/s-prosvirnin/devtools.pros
-#RUN go build github.com/s-prosvirnin/devtools.pros/cmd
-#WORKDIR /src/cmd
-#RUN go build -o ./ ./cmdd/main.go
-RUN go build github.com/s-prosvirnin/devtools.pros/
-#RUN go build -v ./cmd
-#RUN go build -v  ./cmd/
+#RUN go mod download
 
-RUN chown -R $user:$group /app
-RUN chmod 777 ./cmdd
+# билдим go бинарник
+#RUN go build -o ../ ./cmd/main.go
 
-WORKDIR /app
-
-#CMD ./cmdd
-#CMD cd ./ && ls -la
-#CMD go env
-CMD ls -la /go
+# запускаем сбилженый бинарник во время docker up ()
+CMD go build -o ../ ./cmd/main.go && ../main
+#ENTRYPOINT go build -o ../ ./cmd/main.go && ../main

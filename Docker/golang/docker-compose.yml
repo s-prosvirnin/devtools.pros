@@ -3,11 +3,18 @@ version: '3.4'
 services:
     golang.dev:
         container_name: golang.dev
-        build: .
-        ports:
-            - "3000:3000"
+        build:
+            context: .
+            target: golang_dev
         environment:
             user: $user
             group: $group
+        networks:
+            - golang.dev
         volumes:
-            - "${PWD}/src:/app"
+            - "${PWD}/src:/app/src"
+        ports:
+            - "3000:3000"
+networks:
+    golang.dev:
+        driver: bridge

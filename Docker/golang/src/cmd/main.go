@@ -5,12 +5,12 @@ import "log"
 import "time"
 
 func main() {
-    log.Println("123123")
+    log.Println("------14------")
     time.Sleep(5 * time.Second)
 	r := gin.Default()
-	r.GET("/ping", func(c *gin.Context) {
+	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
-			"message": "pong",
+			"message": "halo",
 		})
 	})
 	r.Run(":3000")
