@@ -12,7 +12,7 @@ services:
         networks:
             - golang.dev
         volumes:
-            - "${PWD}/src:/app/src"
+            - "${PWD}/src:/go/src"
         ports:
             - "3000:3000"
 networks:
