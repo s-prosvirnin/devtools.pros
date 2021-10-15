@@ -9,10 +9,16 @@ services:
         environment:
             user: $user
             group: $group
+        #command: /go/entrypoint.sh
+        #entrypoint: /go/entrypoint.sh
+        #command: $entrypoint
+        command: "${entrypoint}"
+        #command: "echo ${entrypoint}"
+        #command: ls -la
         networks:
             - golang.dev
         volumes:
-            - "${PWD}/src:/go/src"
+            - "${PWD}:/go"
         ports:
             - "3000:3000"
 networks:

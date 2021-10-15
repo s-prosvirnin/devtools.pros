@@ -11,10 +11,10 @@ WORKDIR /go/src
 #COPY ./src/go.mod ./
 #COPY ./src/go.sum ./
 #COPY ./src/cmd/main.go ./cmd/
-COPY ./src/ ./
+#COPY ./src/ ./
 
 # скачиваем нужные зависимости для go
-RUN go mod tidy
+#RUN go mod tidy
 #RUN go mod download
 
 # билдим go бинарник
@@ -22,5 +22,7 @@ RUN go mod tidy
 
 # запускаем сбилженый бинарник во время docker up ()
 #CMD go build -o ../ ./cmd/main.go && ../main
-CMD go build -o ../bin ./cmd/main.go && ../bin/main
+#CMD go build -o ../bin ./cmd/main.go && ../bin/main
 #ENTRYPOINT go build -o ../ ./cmd/main.go && ../main
+
+#https://stackoverflow.com/questions/51097652/install-node-modules-inside-docker-container-and-synchronize-them-with-host
