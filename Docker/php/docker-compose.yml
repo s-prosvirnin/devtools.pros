@@ -1,0 +1,41 @@
+version: '3'
+services:
+    php-fpm.dev:
+        container_name: php-fpm.dev
+        build:
+            context: ./php-fpm
+            dockerfile: Dockerfile
+        image: php:7.4-fpm
+        environment:
+            TZ: Europe/Moscow
+            PHP_ERROR_LOG: "on"
+            user: $user
+            group: $group
+            #XDEBUG_CONFIG: "remote_host=192.168.220.1 remote_enable=1 remote_autostart=1 remote_port=9010 idekey=PHPSTORM remote_connect_back=0"
+            #XDEBUG_CONFIG: "remote_host=docker.for.mac.localhost remote_enable=1 remote_autostart=1 remote_port=9011 idekey=PHPSTORM remote_connect_back=0"
+            PHP_IDE_CONFIG: "serverName=Docker"
+        volumes:
+            - "${PWD}:/app"
+        networks:
+            - php.dev
+    nginx.dev:
+        container_name: nginx-ffs.dev
+        image: nginx:latest
+        environment:
+            TZ: Europe/Moscow
+        ports:
+            - 8091:8080
+        volumes:
+            - "${PWD}:/app"
+            - "${PWD}/Docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf"
+        depends_on:
+            - php-fpm.dev
+        networks:
+            - php.dev
+networks:
+    php.dev:
+        driver: bridge
+        ipam:
+            driver: default
+            config:
+                -   subnet: 192.168.220.0/28

@@ -1,0 +1,13 @@
+version: '3.4'
+
+services:
+  golang.dev:
+    container_name: golang.dev
+    build:
+      context: .
+      target: golang_dev
+    environment:
+      user: $user
+      group: $group
+    # bash -c - так можно запускать несколько команд (потому как && не работает)
+    command: bash -c "${entrypoint}"
