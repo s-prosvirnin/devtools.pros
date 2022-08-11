@@ -1,34 +1,48 @@
+# подробнее: https://www.confluent.io/blog/kafka-client-cannot-connect-to-broker-on-aws-on-docker-etc/
 version: '3'
 services:
-  dev-zookeeper:
-    container_name:   dev-zookeeper
+  zookeeper:
+    container_name: zookeeper
+    hostname: zookeeper
     image: wurstmeister/zookeeper
     ports:
-      - "2181:2181"
-
-  dev-kafka:
-    container_name: dev-kafka
-    hostname: dev-kafka
-    image: wurstmeister/kafka
+      - "2182:2181"
+    networks:
+      - net
+  kafka:
+    container_name: kafka
+    image: wurstmeister/kafka:2.13-2.6.0
     depends_on:
-      -   dev-zookeeper
+      - zookeeper
     ports:
-      - "9092:9092"
-    expose:
-      - "9093"
+      - "19092:19092"
     environment:
-      KAFKA_ADVERTISED_LISTENERS: INSIDE://:9093,OUTSIDE://:9092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
-      KAFKA_LISTENERS: INSIDE://:9093,OUTSIDE://:9092
-      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
-      KAFKA_ZOOKEEPER_CONNECT: dev-zookeeper:2181
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      # BROKER - алиас для брокера
+      # LISTENER - алиас для слушателя
+      KAFKA_LISTENERS: "BROKER://:9092,LISTENER://:19092"
+      # добавляем дополнительного слушателя-посредника (LISTENER), чтобы мы могли из вне докера стучаться на внутренний ip брокера (в данном случае это название контейнера "kafka")
+      # т.е. вне докера мы коннектимся на localhost:19092, а внутри коннектимся на kafka:9092
+      KAFKA_ADVERTISED_LISTENERS: "BROKER://kafka:9092,LISTENER://localhost:19092"
+      # протоколы для брокера и слушателя-посредника
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "BROKER:PLAINTEXT,LISTENER:PLAINTEXT"
+      # здесь мы как раз говорим, что в качестве брокера используем алиас BROKER
+      KAFKA_INTER_BROKER_LISTENER_NAME: "BROKER"
+      # создаем топик при старте
       KAFKA_CREATE_TOPICS: "test:1:1"
-  dev-kafka-ui:
-    container_name: dev-kafka-ui
+    networks:
+      - net
+  kafka-ui:
+    container_name:   kafka-ui
     image: quay.io/cloudhut/kowl:master
     ports:
       - "8086:8080"
     depends_on:
-      -   dev-kafka
+      - kafka
     environment:
-      KAFKA_BROKERS=host.docker.internal:9092:
+      KAFKA_BROKERS=kafka:9092:
+    networks:
+      - net
+
+networks:
+  net:
