@@ -1,3 +1,4 @@
+# правильный рабочий yaml
 # подробнее: https://www.confluent.io/blog/kafka-client-cannot-connect-to-broker-on-aws-on-docker-etc/
 version: '3'
 services:
