@@ -1,0 +1,60 @@
+version: '3'
+
+services:
+  php-fpm.xstack:
+    container_name: php-fpm.xstack
+    build:
+      context: ./var
+      dockerfile: Dockerfile
+    image: php8
+    environment:
+      TZ: Europe/Moscow
+      PHP_ERROR_LOG: "on"
+      user: $user
+      group: $group
+      PHP_IDE_CONFIG: "serverName=Docker"
+    expose:
+      - 9000
+    volumes:
+      - "${PWD}:/src"
+      - "${PWD}/var/php.ini:/usr/local/etc/php/php.ini"
+    networks:
+      - php-fpm.xstack
+
+  nginx.xstack:
+    container_name: nginx.xstack
+    image: nginx:latest
+    environment:
+      TZ: Europe/Moscow
+    ports:
+      - 8091:8080
+    volumes:
+      - "${PWD}:/src"
+      - "${PWD}/var/nginx.conf:/etc/nginx/conf.d/default.conf"
+    depends_on:
+      - php-fpm.xstack
+    networks:
+      - php-fpm.xstack
+
+  percona-admin-panel.xstack:
+    container_name: percona-admin-panel.xstack
+    image: percona/percona-server:8.0.34
+    restart: on-failure
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: accounter_dev
+      MYSQL_USER: dbuser
+      MYSQL_PASSWORD: dbpass
+    ports:
+      - '33062:3306'
+    volumes:
+      - "${PWD}/var/db-data:/var/lib/mysql"
+      - "${PWD}/var/my.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf"
+
+networks:
+  php-fpm.xstack:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        -   subnet: 192.168.220.0/28
