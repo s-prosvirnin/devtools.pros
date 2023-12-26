@@ -10,7 +10,7 @@ services:
       - '33061:3306'
     volumes:
       - db-data:/var/lib/mysql # store data to local machine
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql # need flush data (docker-compose down -v) to reinitialize
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql # need unmount volumes (docker-compose down -v) to reinitialize
       - ./my.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf
 
 volumes:
