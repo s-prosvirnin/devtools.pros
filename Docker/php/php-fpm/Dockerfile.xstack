@@ -1,0 +1,57 @@
+FROM php:8.0-fpm as php8
+
+RUN apt-get update
+
+# localities
+RUN apt-get install -y locales locales-all
+ENV LC_ALL en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US.UTF-8
+
+# install linux packages
+RUN apt-get install --no-install-recommends -y \
+    libfreetype6-dev \
+    libjpeg62-turbo-dev \
+    libmcrypt-dev \
+    libpng-dev \
+    zlib1g-dev \
+    libxml2-dev \
+    libicu-dev \
+    libaio-dev \
+    libssl-dev \
+    libc-client-dev \
+    openssl \
+    libkrb5-dev \
+    libpq-dev \
+    supervisor \
+    g++ \
+    apache2-utils \
+    libzip-dev \
+    unzip \
+    libcurl4-openssl-dev \
+    libldap2-dev \
+    wget \
+    libonig-dev
+
+# install nodejs
+RUN apt-get install -y nodejs npm
+RUN npm install --global yarn
+
+# install php extensions
+RUN docker-php-ext-configure imap --with-kerberos --with-imap-ssl \
+    && docker-php-ext-install pcntl pdo mysqli pdo_mysql imap ldap xml curl mbstring zip
+RUN docker-php-ext-enable mysqli
+#xdebug
+RUN pecl uninstall xdebug
+RUN pecl install xdebug
+RUN docker-php-ext-enable xdebug
+
+# install composer
+RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
+    && php composer-setup.php --install-dir=/usr/bin --filename=composer \
+    && php -r "unlink('composer-setup.php');"
+
+WORKDIR /src
+
+#передаем права указанному в аргументах юзеру
+RUN chown -R $user:$group /src
