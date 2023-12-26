@@ -9,6 +9,6 @@ generate_accounts:
 db_up:
 	docker-compose up
 
-# Flush data and reinitialize.
+# Unmount volumes and reinitialize.
 db_flush:
 	docker-compose down -v
